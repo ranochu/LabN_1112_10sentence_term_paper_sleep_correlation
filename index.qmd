@@ -1,0 +1,153 @@
+---
+title: "LabN_1112_10sentence_term_parper_sleep_correlation"
+date: today
+author:
+  - name: Rano Chu
+    email: pengyuchu@ln.hk
+    affiliation: 
+      - University of Wisconsin–Madison
+abstract: > 
+  In this study, we examine the correlations among sleep health and daily lifestyle factors using Python and Quarto.
+keywords:
+  - Correlation
+  - Quarto
+  - sleep
+format:
+  html:
+    theme: cosmos
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-fold: show
+execute:
+    echo: true
+bibliography: references.bib
+---
+
+# Introduction
+
+```{python}
+import os
+import kagglehub
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+
+path = kagglehub.dataset_download("uom190346a/sleep-health-and-lifestyle-dataset")
+df = pd.read_csv(os.path.join(path, "Sleep_health_and_lifestyle_dataset.csv"))
+```
+
+For this study, researchers at UW-Madison's DSHB program have had an interest in learning more about the correlations among sleep and daily lifestyle factors. Our program will use this topic as a demonstration of working with correlation analysis in Python and Quarto; we have data from `{python} f"{df.shape[0]}"` participants and our research question is to identify which daily lifestyle and physiological factors (such as stress level, physical activity, daily steps, heart rate, and age) most strongly correlate with both sleep duration and subjective sleep quality.
+
+# Literature Review
+
+Previous psychological and health research has consistently demonstrated that sleep health is shaped by multiple interacting behavioral and physiological factors. Specifically, elevated levels of perceived psychological stress are strongly associated with shorter sleep duration and poorer subjective sleep quality [@akerstedt2006psychosocial], whereas regular physical activity has been shown to significantly improve sleep efficiency and overall sleep quality [@kredlow2015effects]. While the Sleep Health and Lifestyle Dataset [@tharmalingam2023sleep] is frequently utilized in data science to demonstrate multi-class classification methods (such as predicting sleep disorders), we use it here to demonstrate multivariate correlation analysis across multiple lifestyle and physiological indicators of sleep health.
+
+# Method
+
+Given that we have multiple columns of continuous and quasi-continuous numerical data—including sleep duration (in hours), sleep quality (1–10 scale), stress level (1–10 scale), physical activity level (minutes/day), daily steps, resting heart rate (bpm), and age—we will evaluate these relationships using a Pearson correlation matrix visualized as an annotated heatmap, supplemented by scatterplots with linear trend lines for the strongest predictors. These methods serve as classic and foundational starting points when exploring linear associations across multiple behavioral and physiological variables simultaneously.
+
+# Results
+
+```{python}
+import numpy as np
+
+# 1. 计算全数值变量的相关性矩阵（剔除无意义的 Person ID）
+numeric_cols = [
+    'Sleep Duration', 'Quality of Sleep', 'Physical Activity Level',
+    'Stress Level', 'Heart Rate', 'Daily Steps', 'Age'
+]
+corr_matrix = df[numeric_cols].corr()
+
+# 2. 提取核心预测变量（Stress Level）与 Sleep Duration 及 Quality of Sleep 的相关系数
+corr_stress_dur = corr_matrix.loc['Stress Level', 'Sleep Duration']
+corr_stress_qual = corr_matrix.loc['Stress Level', 'Quality of Sleep']
+
+# 动态生成相关性强度描述（修复了原模板负相关区间逻辑）
+def interpret_corr(r):
+    if r > 0.8:
+        return "a very strong positive correlation"
+    elif r > 0.4:
+        return "a moderate-to-strong positive correlation"
+    elif r > 0:
+        return "a weak positive correlation"
+    elif r > -0.4:
+        return "a weak negative correlation"
+    elif r > -0.8:
+        return "a moderate-to-strong negative correlation"
+    else:
+        return "a very strong negative correlation"
+
+narrative_dur = interpret_corr(corr_stress_dur)
+narrative_qual = interpret_corr(corr_stress_qual)
+```
+
+Using the classic Pearson correlation approach across all lifestyle and physiological variables, psychological stress emerges as the strongest predictor of both sleep outcomes: it produces a correlation coefficient of `{python} f"{corr_stress_dur:.5f}"` with sleep duration (`{python} f"{narrative_dur}"`) and `{python} f"{corr_stress_qual:.5f}"` with sleep quality (`{python} f"{narrative_qual}"`). As shown in @fig-sleep-heatmap, beyond stress level, resting heart rate also negatively correlates with sleep duration and quality, whereas physical activity level and age show positive associations with overall sleep health.
+
+``` {python}
+#| label: fig-sleep-heatmap
+#| fig-cap: "Pearson correlation heatmap of sleep outcomes and daily lifestyle/physiological variables"
+
+fig, ax = plt.subplots(figsize=(7.5, 5.5))
+sns.heatmap(
+    corr_matrix,
+    annot=True,
+    cmap="coolwarm",
+    fmt=".2f",
+    vmin=-1,
+    vmax=1,
+    linewidths=0.5,
+    ax=ax
+)
+plt.title("Correlation Matrix: Sleep Health & Lifestyle Factors")
+plt.xticks(rotation=35, ha='right')
+plt.tight_layout()
+```
+Furthermore, @fig-stress-sleep-reg provides visual confirmation of this strong downward linear trend, illustrating how daily sleep duration steadily declines as perceived stress increases.
+
+```{python}
+#| label: fig-stress-sleep-reg
+#| fig-cap: "Relationship between self-reported stress level and daily sleep duration with linear trend"
+
+fig, ax = plt.subplots(figsize=(6.5, 4))
+sns.regplot(
+    data=df,
+    x='Stress Level',
+    y='Sleep Duration',
+    x_jitter=0.15,  # 轻微水平抖动，避免整数评分点重叠
+    scatter_kws={'alpha': 0.5, 'color': '#2b5c8f'},
+    line_kws={'color': '#d9534f'},
+    ax=ax
+)
+plt.xlabel('Self-Reported Stress Level (1–10 Scale)')
+plt.ylabel('Sleep Duration (Hours)')
+plt.tight_layout()
+```
+Finally, @fig-sleep-joint illustrates the strong positive coupling between the two core sleep outcomes themselves, showing that participants who achieve longer sleep durations consistently report higher subjective sleep quality.
+
+```{python}
+#| label: fig-sleep-joint
+#| fig-cap: "Joint distribution and regression fit between sleep duration and subjective sleep quality"
+
+g = sns.jointplot(
+    data=df,
+    x='Sleep Duration',
+    y='Quality of Sleep',
+    kind='reg',
+    color='#4CB391',
+    height=5.5
+)
+g.set_axis_labels('Sleep Duration (Hours)', 'Quality of Sleep (1–10 Scale)')
+```
+
+# Discussion
+
+Now that this long-standing problem (of over 10 minutes) is resolved (thanks to the diligent efforts of UW-Madison's DSHB program), science has once again triumphed in establishing that elevated psychological stress—alongside higher resting heart rate—strongly undermines both sleep duration and subjective sleep quality, whereas regular physical activity supports healthier sleep as a matter of empirically grounded truth. Future research should move beyond cross-sectional correlations to examine longitudinal and causal interventions for stress reduction and sleep hygiene.
+
+
+# References
+
+:::{#refs}
+:::
+
+

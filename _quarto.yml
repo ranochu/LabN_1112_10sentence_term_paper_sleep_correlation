@@ -1,0 +1,21 @@
+project:
+  type: website
+
+website:
+  title: "LabN_1112_10sentence_term_parper_sleep_correlation"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - about.qmd
+
+format:
+  html:
+    theme:
+      - cosmo
+      - brand
+    css: styles.css
+    toc: true
+
+
+
