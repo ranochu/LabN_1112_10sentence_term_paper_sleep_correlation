@@ -1,0 +1,138 @@
+# Content created by the ChatGPT
+# The prompt is "I need you to write the contents of a simple base .gitignore file for me. I will copy and paste what you provide to the .gitignore here in the chat. My project is a Quarto website and I’m using either or both Python and R in my work. Please generate a sensible .gitignore for a project of this type for me. Be sure to exclude system and artifact files for both MacOS and Windows. Have it ignore files that are remnants or artifacts of Python, R, Quarto, IDEs, Jupyter Lab, Jupyter Notebooks, and related."
+# ==========================================
+# Quarto
+# ==========================================
+
+.quarto/
+.quarto_*
+_freeze/
+
+# Quarto rendered website
+_site/
+
+# ==========================================
+# R
+# ==========================================
+
+.Rhistory
+.RData
+.Ruserdata
+.Rproj.user/
+
+# ==========================================
+# Python
+# ==========================================
+
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Python packaging and distribution
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Python testing and coverage
+.pytest_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+.pyre/
+.mypy_cache/
+.dmypy.json
+.ruff_cache/
+
+# ==========================================
+# Jupyter Notebook / JupyterLab
+# ==========================================
+
+.ipynb_checkpoints/
+.jupyter/
+*.nbconvert.ipynb
+
+# ==========================================
+# IDEs and Editors
+# ==========================================
+
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+*.swp
+*.swo
+*~
+
+# ==========================================
+# macOS
+# ==========================================
+
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100/
+.Trashes/
+.fseventsd/
+.VolumeIcon.icns
+
+# ==========================================
+# Windows
+# ==========================================
+
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# ==========================================
+# Temporary and Log Files
+# ==========================================
+
+*.tmp
+*.temp
+*.bak
+*.old
+*.log
+*.cache
+
+# ==========================================
+# Other generated artifacts
+# ==========================================
+
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+*.toc
+*.out
+/.quarto/
+**/*.quarto_ipynb
